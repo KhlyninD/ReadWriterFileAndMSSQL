@@ -29,18 +29,14 @@ namespace ReadWriterFileAndMSSQL
                     if (key.Key == ConsoleKey.Y)
                     {
 
-                        List<string> inputTxtLine = new List<string>();
+                        
                         string pathTxtFile = @"input.txt";
+                        var inputTxtLine = ReadText(pathTxtFile);
 
-                        inputTxtLine.AddRange(ReadText(pathTxtFile));
-
-
-                        DataSet dateSql = new DataSet();
-                        string sqlExpression = inputTxtLine[0];
-
-                        string connectionString = config.GetConnectionString("ConnectionString");
-
-                        ReadDb(connectionString, sqlExpression, dateSql);
+                        
+                        
+                        string connectionString = config.GetConnectionString("DBInfo");
+                        var dateSql = ReadDb(connectionString, inputTxtLine);
 
 
                         string pathCsvFile = @"output.csv";
@@ -91,13 +87,20 @@ namespace ReadWriterFileAndMSSQL
             }
         }
 
-        private static void ReadDb(string connectionString, string sqlExpression, DataSet dateSql)
+        private static DataSet ReadDb(string connectionString, IEnumerable<string> sqlExpression)
         {
+            DataSet dateSql = new DataSet();
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
-                SqlDataAdapter adapter = new SqlDataAdapter(sqlExpression, connection);
-                adapter.Fill(dateSql);
+                foreach(var i in sqlExpression)
+                {
+                    SqlDataAdapter adapter = new SqlDataAdapter(i, connection);
+                    adapter.Fill(dateSql);
+                }
+
             }
+
+            return dateSql;
         }
 
         private static IEnumerable<string> ReadText(string pathTxtFile)

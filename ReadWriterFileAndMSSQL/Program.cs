@@ -14,6 +14,11 @@ namespace ReadWriterFileAndMSSQL
     {
         static void Main(string[] args)
         {
+            var builder = new ConfigurationBuilder();
+            builder.SetBasePath(Directory.GetCurrentDirectory());
+            builder.AddJsonFile("appsettings.json");
+            var config = builder.Build();
+
             while (true)
             {
                 try
@@ -33,7 +38,7 @@ namespace ReadWriterFileAndMSSQL
                         DataSet dateSql = new DataSet();
                         string sqlExpression = inputTxtLine[0];
 
-                        string connectionString = "Server=localhost;Database=test;User Id=sa;Password=qaz123QAZ";
+                        string connectionString = config.GetConnectionString("ConnectionString");
 
                         ReadDb(connectionString, sqlExpression, dateSql);
 

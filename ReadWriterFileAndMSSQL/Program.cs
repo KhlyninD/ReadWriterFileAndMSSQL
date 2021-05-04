@@ -31,16 +31,15 @@ namespace ReadWriterFileAndMSSQL
 
                         
                         string pathTxtFile = @"input.txt";
+                        string pathCsvFile = @"output.csv";
                         var inputTxtLine = ReadText(pathTxtFile);
 
-                        
-                        
                         string connectionString = config.GetConnectionString("DBInfo");
-                        var dateSql = ReadDb(connectionString, inputTxtLine);
-
-
-                        string pathCsvFile = @"output.csv";
-                        WriterCsv(pathCsvFile, dateSql);
+                        foreach (var i in inputTxtLine)
+                        {
+                            var dateSql = ReadDb(connectionString, i);
+                            WriterCsv(pathCsvFile, dateSql);
+                        }
                     }
                     else if (key.Key == ConsoleKey.N)
                     {
@@ -65,7 +64,7 @@ namespace ReadWriterFileAndMSSQL
 
         private static void WriterCsv(string pathCsvFile, DataSet dateSql)
         {
-            using (var writer = new StreamWriter(pathCsvFile))
+            using (var writer = new StreamWriter(pathCsvFile, true))
             using (var csvWriter = new CsvWriter(writer, CultureInfo.InvariantCulture))
             {
 
@@ -87,16 +86,15 @@ namespace ReadWriterFileAndMSSQL
             }
         }
 
-        private static DataSet ReadDb(string connectionString, IEnumerable<string> sqlExpression)
+        private static DataSet ReadDb(string connectionString, string sqlExpression)
         {
             DataSet dateSql = new DataSet();
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
-                foreach(var i in sqlExpression)
-                {
-                    SqlDataAdapter adapter = new SqlDataAdapter(i, connection);
+
+                    SqlDataAdapter adapter = new SqlDataAdapter(sqlExpression, connection);
                     adapter.Fill(dateSql);
-                }
+
 
             }
 
